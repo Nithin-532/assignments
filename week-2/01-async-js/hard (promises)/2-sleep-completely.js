@@ -7,6 +7,9 @@
 function sleep(milliseconds) {
   return new Promise(function(resolve) {
     setTimeout(resolve, milliseconds);
+    // let time = 1000000 * milliseconds;
+    // for (let i = 0; i < time; i++) { };
+    // resolve();
   })
 }
 

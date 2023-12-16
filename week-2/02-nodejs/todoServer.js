@@ -43,7 +43,65 @@
   const bodyParser = require('body-parser');
   
   const app = express();
+
+  let todoList = [];
   
   app.use(bodyParser.json());
+
+  app.get('/todos', function(req, res) {
+    res.json(todoList);
+  })
+
+  app.get('/todos/:id', function(req, res) {
+    const id = req.params.id;
+    const todo = todoList.find(obj => obj.id === parseInt(id));
+    if (!todo) {
+      res.status(404).send("404 Not Found");
+    } else {
+      res.json(todo);
+    }
+  })
+
+  app.post('/todos', function(req, res) {
+    let id = 1;
+    if (todoList.length > 0) id = todoList[todoList.length - 1].id + 1;
+    const data = req.body;
+    const obj = Object.assign({}, {id}, data);
+    todoList.push(obj);
+    res.status(201).json({
+      id
+    })
+  })
+
+  app.put('/todos/:id', function(req, res) {
+    const id = req.params.id;
+    const body = req.body;
+    const todoIndex = todoList.findIndex(obj => obj.id === parseInt(id));
+    if (todoIndex !== -1) {
+      todoList[todoIndex] = Object.assign({}, {id: parseInt(id)}, body)
+      res.send("200 OK");
+    } else {
+      res.status(404).send("404 Not Found");
+    }
+  })
+
+  app.delete('/todos/:id', function(req, res) {
+    const id = req.params.id;
+    const todoIndex = todoList.findIndex(obj => obj.id === parseInt(id));
+    if (todoIndex !== -1) {
+      todoList.splice(todoIndex, 1);
+      res.send("200 OK");
+    } else {
+      res.status(404).send("404 Not Found");
+    }
+  })
+
+  app.all('*', function(req, res) {
+    res.status(404).send("404 Not Found");
+  })
+
+  // app.listen(3000, function() {
+  //   console.log("Server running on 3000");
+  // });
   
   module.exports = app;

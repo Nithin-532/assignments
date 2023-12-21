@@ -1,24 +1,87 @@
 const { Router } = require("express");
 const router = Router();
+const jwt = require('jsonwebtoken');
+const secretKey = '@34TYUi09#nupq1'
 const userMiddleware = require("../middleware/user");
+const { User, Course } = require("../db");
+const { signJwt } = require("../../02-jwt");
 
 // User Routes
-app.post('/signup', (req, res) => {
+router.post('/signup', async (req, res) => {
     // Implement user signup logic
+    const username = req.body.username;
+    const password = req.body.password;
+
+    const query = await User.findOne({ username: username });
+    if (query) {
+        res.status(409).send("User already exists");
+    } else {
+        const user = new User({
+            username: username,
+            password: password
+        });
+        user.save();
+        res.send({ message: 'User created successfully' });
+    }
 });
 
-app.post('/signin', (req, res) => {
+router.post('/signin', async (req, res) => {
     // Implement admin signup logic
+    const username = req.body.username;
+    const password = req.body.password;
+
+    const query = await User.findOne({ username: username, password: password });
+    if (query) {
+        const token = jwt.sign({ username }, secretKey);
+        // const token = signJwt(username, password);
+        res.send({ token });
+    } else {
+        res.status(404).send("User not found");
+    }
 });
 
-app.get('/courses', (req, res) => {
+router.get('/courses', (req, res) => {
     // Implement listing all courses logic
+    Course.find({})
+          .then(function(courses) {
+            res.send({ Courses: courses });
+          })
+          .catch(function(err) {
+            res.status(500).send("Internal server error");
+          })
 });
 
-app.post('/courses/:courseId', userMiddleware, (req, res) => {
+router.post('/courses/:courseId', userMiddleware, (req, res) => {
     // Implement course purchase logic
+    const courseId = req.params.courseId;
+    const token = req.headers.authorization;
+    const decodeToken = token.split(' ')[1];
+    const username = jwt.decode(decodeToken).username;
+
+    User.findOneAndUpdate({ username }, { $push: {purchasedCourses: courseId }}, { new: true })
+        .then(function() {
+            res.send({ message: 'Course purchased successfully' });
+        })
+        .catch(function(err) {
+            res.status(500).send("Internal server error");
+        })
 });
 
-app.get('/purchasedCourses', userMiddleware, (req, res) => {
+router.get('/purchasedCourses', userMiddleware, (req, res) => {
     // Implement fetching purchased courses logic
+    const token = req.headers.authorization;
+    const decodeToken = token.split(' ')[1];
+    const username = jwt.decode(decodeToken).username;
+
+    User.findOne({ username })
+        .populate("purchasedCourses")
+        .exec()
+        .then(function(courses) {
+            res.send({"Courses": courses});
+        })
+        .catch(function(err) {
+            res.status(500).send("Internal server error");
+        })
 });
+
+module.exports = router;

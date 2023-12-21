@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const jwtPassword = 'secret';
+const zod = require('zod');
 
 
 /**
@@ -15,6 +16,16 @@ const jwtPassword = 'secret';
  */
 function signJwt(username, password) {
     // Your code here
+    const usernameSchema = zod.string().email();
+    const passwordSchema = zod.string().min(6);
+
+    const usernameResponse = usernameSchema.safeParse(username);
+    const passwordResponse = passwordSchema.safeParse(password);
+
+    if (usernameResponse.success && passwordResponse.success) {
+        return jwt.sign({ username }, jwtPassword);
+    }
+    return null;
 }
 
 /**
@@ -27,6 +38,12 @@ function signJwt(username, password) {
  */
 function verifyJwt(token) {
     // Your code here
+    try {
+        const verify = jwt.verify(token, jwtPassword);
+    } catch (error) {
+        return false;
+    }
+    return true;
 }
 
 /**
@@ -38,6 +55,10 @@ function verifyJwt(token) {
  */
 function decodeJwt(token) {
     // Your code here
+    const parts = token.split('.');
+    if (parts.length !== 3) return false;
+    const decode = jwt.decode(token);
+    return true;
 }
 
 
@@ -47,3 +68,8 @@ module.exports = {
   decodeJwt,
   jwtPassword,
 };
+
+// Key takeaways => 
+// Use try catch blocks to handle exceptions mainly for jwt.verify() as it is an async function. => it returns a promise.
+// A token that needs to be checked will consists of three parts divided by a period(.). A header, payload and signature.
+

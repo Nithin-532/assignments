@@ -32,6 +32,7 @@ router.post('/signin', (req, res) => {
     const password = req.body.password;
 
     const token = jwt.sign({ username }, secretKey, { expiresIn: '2h' });
+    // const token = signJwt(username, password);
     res.send({ token });
 });
 

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+  <html>
+
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width">
+      <title>Infn</title>
+      <script>
+        // debouncing
+        let timeout;
+        function debouncePopulateDiv() {
+          // delay the call to populateDiv until this function not be called for 100ms
+          // and I've been called atleast once
+          // We can use setTimeout
+          // start the clock and if debounce is called again stop the clock to make it debounce.
+          // clearTimeout
+          clearTimeout(timeout);
+
+          timeout = setTimeout(function() {
+            populateDiv();
+          }, 1000);
+          // This thing is cool - debouncing
+        }
+
+        async function populateDiv() {
+          const nums = document.querySelectorAll('input');
+          const a = parseInt(nums[0].value);
+          const b = parseInt(nums[1].value);
+          const finalSum = document.getElementById("finalSum");
+          // fetch
+          const data = await fetch(`http://localhost:3000/sum?a=${a}&b=${b}`);
+          const response = await data.json();
+          const result = await response.result;
+          finalSum.innerHTML = `The result is ${result}`;
+        }
+      </script>
+    </head>
+
+    <body>
+
+      <input 
+      oninput="debouncePopulateDiv()" type="text" placeholder="First number" />
+      <br></br>
+
+      <input 
+      oninput="debouncePopulateDiv()" type="text" placeholder="Second number" />
+      <br></br>
+      <br></br>
+      <div id="finalSum"></div>
+      
+    </body>
+
+</html>

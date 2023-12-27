@@ -43,10 +43,16 @@ app.post("/", function(req, res) {
 })
 
 app.put("/", function(req, res) {
-  for (let i = 0; i < users[0].kidneys.length; i++) {
-    users[0].kidneys[i].healthy = true;
+  if (isThereAtLeastOneUnhealthyKidney()) {
+    for (let i = 0; i < users[0].kidneys.length; i++) {
+      users[0].kidneys[i].healthy = true;
+    }
+    res.json({});
+  } else {
+    res.status(411).json({
+      msg: "There are no unhealthy kidneys"
+    })
   }
-  res.json({});
 })
 
 function isThereAtLeastOneUnhealthyKidney() {

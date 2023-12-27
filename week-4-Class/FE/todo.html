@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Todo</title>
+  <script>
+    let globalId = 1;
+
+    function markAsDone(id) {
+      const parent = document.getElementById(id);
+      parent.children[2].innerHTML = 'Done!';
+    }
+
+    function addTodo() {
+      const title = document.getElementById("title").value;
+      const info = document.getElementById("info").value;
+      const div = document.createElement("div");
+      const h2 = document.createElement("h2");
+      const p = document.createElement("p");
+      const button = document.createElement("button");
+      h2.innerText = title;
+      p.innerText = info;
+      button.innerText = "Mark as Done";
+      button.setAttribute("onclick", `markAsDone(${globalId})`);
+      div.append(h2, p, button);
+      div.setAttribute("id", globalId++);
+      const container = document.getElementById("container");
+      container.appendChild(div);
+    }
+  </script>
+</head>
+<body>
+  <input id="title" type="text" placeholder="title" />
+  <br></br>
+  <input id="info" type="text" placeholder="info" />
+  <br></br>
+  <button onclick="addTodo()">Add Todo</button>
+  <br></br>
+  <div id="container"></div>
+</body>
+</html>

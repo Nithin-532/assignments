@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interest</title>
+  <script>
+    function calculateInterest() {
+      const principal = document.getElementById("principal").value;
+      const rate = document.getElementById("rate").value;
+      const time = document.getElementById("time").value;
+      const result = document.getElementById("result");
+      fetch(`http://localhost:3000/interest?principal=${principal}&rate=${rate}&time=${time}`)
+        .then(res => res.json())
+        .then(data => {
+          result.innerHTML = `<p>Total: ${data.total}</p> <p>Interest: ${data.interest}</p>`;
+        });          
+    }
+  </script>
+</head>
+<body>
+  <div>
+    <h1>Calculate Interest</h1>
+    <br></br>
+    <input id="principal" type="text" placeholder="What is your principal amount?" />
+    <br></br>
+    <input id="rate" type="text" placeholder="What is your rate of Interest?" />
+    <br></br>
+    <input id="time" type="text" placeholder="What is your period?" />
+    <br></br>
+    <button onclick="calculateInterest()">Calculate Interest</button>
+    <br></br>
+    <div id="result"></div>
+  </div>
+</body>
+</html>

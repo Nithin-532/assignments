@@ -51,6 +51,8 @@ router.get('/courses', (req, res) => {
           })
 });
 
+// eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVzZXIiLCJpYXQiOjE3MDMxODE0MzN9.9e7UqfSwW9Fo-G91N0ActjV8I7xvihpFUdDY0AaYOQg
+
 router.post('/courses/:courseId', userMiddleware, (req, res) => {
     // Implement course purchase logic
     const courseId = req.params.courseId;

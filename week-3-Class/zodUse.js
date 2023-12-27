@@ -22,7 +22,7 @@ app.use(express.json());
 // })
 
 app.post('/health-checkup', function(req, res) {
-  const kidneys = req.body.kidneys;
+  const kidneys = req.body.kidneys; // array of numbers (kidneys = [1, 2])
   const response = schema.safeParse(kidneys);
   res.send({
     response

@@ -1,5 +1,5 @@
-const secretKey = '@34TYUi09#nupq1'
 const jwt = require('jsonwebtoken');
+const { SECRET_KEY } = require('../config');
 
 function userMiddleware(req, res, next) {
     // Implement user auth logic
@@ -8,8 +8,11 @@ function userMiddleware(req, res, next) {
     if (typeof token !== 'undefined') {
         const jwtToken = token.split(' ')[1];
         try {
-            const verify = jwt.verify(jwtToken, secretKey);
-            next();
+            const verify = jwt.verify(jwtToken, SECRET_KEY);
+            if (verify.username) {
+                req.username = verify.username;
+                next();
+            }
         } catch(err) {
             res.status(401).send("Unauthorized");
         }

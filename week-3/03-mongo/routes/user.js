@@ -15,11 +15,10 @@ router.post('/signup', async (req, res) => {
     if (query) {
         res.status(404).send({ message: "User already exists" });
     } else {
-        const user = new User({
+        await User.create({
             username: username,
             password: password
         });
-        user.save();
         res.send({ message: 'User created successfully' });
     }
 });
@@ -38,30 +37,34 @@ router.post('/courses/:courseId', userMiddleware, (req, res) => {
     // Implement course purchase logic
     const courseId = req.params.courseId;
     const username = req.headers.username;
-    User.findOneAndUpdate({ username: username }, { $push: {purchasedCourses: courseId } }, { new: true })
-        .then(function() {
-            res.send({ message: 'Course purchased successfully' });
-        })
-        .catch(function(err) {
-            res.status(500).send("Internal server error");
-        });
+    User.updateOne({
+        username
+    }, {
+        "$push": {
+            purchasedCourses: courseId
+        }
+    });
+    res.json({
+        "message": "Purchase completed"
+    })
 });
 
 router.get('/purchasedCourses', userMiddleware, (req, res) => {
     // Implement fetching purchased courses logic
     const username = req.headers.username;
-    User.findOne({ username: username })
-        .populate("purchasedCourses")
-        .exec()
-        .then(function(user) {
-            return user.purchasedCourses;
-        })
-        .then(function(courses) {
-            res.send({ purchasedCourses: courses });
-        })
-        .catch(function(err) {
-            res.status(500).send("Internal server error");
-        })
+    const user = User.findOne({
+        username
+    });
+
+    Course.find({
+        _id: {
+            "$in": user.purchasedCourses
+        }
+    }).then(function(courses) {
+        res.send({ purchasedCourses: courses });
+    }).catch(function(err) {
+        res.status(500).send("Internal server error");
+    })
 });
 
 module.exports = router;

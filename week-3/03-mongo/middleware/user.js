@@ -10,7 +10,7 @@ async function userMiddleware(req, res, next) {
     if (query) {
         next();
     } else {
-        res.status(500).send("Internal server error");
+        res.status(403).send("User doesn't exist");
     }
 }
 

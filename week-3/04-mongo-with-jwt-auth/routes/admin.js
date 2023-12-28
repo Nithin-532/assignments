@@ -1,9 +1,8 @@
 const { Router } = require("express");
-const express = require('express');
 const adminMiddleware = require("../middleware/admin");
 const jwt = require('jsonwebtoken');
-const secretKey = '@34TYUi09#nupq1'
 const { Admin, Course } = require("../db");
+const { SECRET_KEY } = require("../config");
 const router = Router();
 
 // Admin Routes
@@ -17,11 +16,10 @@ router.post('/signup', async (req, res) => {
     if (query) {
         res.status(409).send("Admin already exists");
     } else {
-        const admin = new Admin({
+        await Admin.create({
             username: username,
             password: password
         });
-        admin.save();
         res.json({ message: 'Admin created successfully' });
     }
 });
@@ -31,16 +29,23 @@ router.post('/signin', (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
 
-    const token = jwt.sign({ username }, secretKey, { expiresIn: '2h' });
+    const token = jwt.sign({ username }, SECRET_KEY, { expiresIn: '2h' });
     // const token = signJwt(username, password);
     res.send({ token });
 });
 
-router.post('/courses', adminMiddleware, (req, res) => {
+router.post('/courses', adminMiddleware, async (req, res) => {
     // Implement course creation logic
-    const body = req.body;
-    const course = new Course({ ...body, published: true });
-    course.save();
+    const title = req.body.title;
+    const description = req.body.description;
+    const imageLink = req.body.imageLink;
+    const price = req.body.price;
+    const course = await Course.create({
+        title,
+        description,
+        imageLink,
+        price
+    })
     res.send({ message: 'Course created successfully', courseId: course._id });
 });
 
